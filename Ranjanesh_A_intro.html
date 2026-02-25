@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranjanesh A · Elite VLSI Engineer</title>
+  <style>
+    /* ===== RESET & GLOBAL ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0a0a0f;
+      color: #e6e6e6;
+      font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* ===== AMBIENT PARTICLE GRID (SEMICONDUCTOR CIRCUITS) ===== */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.2;
+    }
+
+    /* ===== BACKGROUND GRADIENT & SOFT RADIAL ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 40%, rgba(0, 240, 255, 0.03) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.03) 0%, transparent 40%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* all content above canvas */
+    .main-wrapper {
+      position: relative;
+      z-index: 5;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ===== TYPOGRAPHY & UTILS ===== */
+    h1, h2, h3 {
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 2.5rem;
+      background: linear-gradient(135deg, #e6e6e6 0%, #d4af37 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+      padding-bottom: 0.5rem;
+    }
+
+    .section-container {
+      padding: 5rem 0 4rem;
+      opacity: 0;
+      transform: translateY(25px);
+      transition: opacity 0.9s cubic-bezier(0.2, 0.9, 0.3, 1), transform 0.9s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    .section-container.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== NAVBAR (glowing glass bar) ===== */
+    .navbar {
+      position: sticky;
+      top: 1.5rem;
+      z-index: 100;
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+      background: rgba(20, 20, 28, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      border-radius: 60px;
+      padding: 0.8rem 2rem;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 240, 255, 0.1) inset;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2.2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-weight: 450;
+      font-size: 1rem;
+      padding: 0.3rem 0;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.2s, color 0.2s, text-shadow 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #00f0ff;
+      box-shadow: 0 0 10px #00f0ff, 0 0 20px #8a2be2;
+      transition: width 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: #ffffff;
+      text-shadow: 0 0 8px #00f0ff;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* ===== HERO SECTION ===== */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 5rem;
+      position: relative;
+    }
+
+    .hero-glow-sphere {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+      animation: rotate3d 20s infinite linear;
+      filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.6));
+    }
+
+    .hero-glow-sphere::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 30%, #8a2be2, #00f0ff, #d4af37);
+      border-radius: 50%;
+      opacity: 0.5;
+      mix-blend-mode: screen;
+      animation: pulseGlow 4s infinite alternate;
+    }
+
+    .hero-glow-sphere::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(0,240,255,0.1) 15px, rgba(138,43,226,0.1) 30px);
+      border-radius: 50%;
+      animation: rotate3d-reverse 30s infinite linear;
+    }
+
+    @keyframes rotate3d {
+      0% { transform: rotateY(0deg) rotateX(10deg); }
+      100% { transform: rotateY(360deg) rotateX(10deg); }
+    }
+    @keyframes rotate3d-reverse {
+      0% { transform: rotateY(0deg) rotateX(-5deg); }
+      100% { transform: rotateY(-360deg) rotateX(-5deg); }
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.4; filter: blur(10px); }
+      100% { opacity: 0.8; filter: blur(18px); }
+    }
+
+    .hero h1 {
+      font-size: 4.5rem;
+      font-weight: 500;
+      color: #ffffff;
+      text-shadow: 0 0 15px #00f0ff, 0 0 30px #8a2be2;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      animation: letterReveal 1.5s ease forwards;
+    }
+
+    @keyframes letterReveal {
+      0% { opacity: 0; transform: translateY(15px); filter: blur(10px); }
+      100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+
+    .hero .title {
+      font-size: 1.5rem;
+      color: #d4af37;
+      margin: 0.5rem 0 1rem;
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }
+
+    .hero .location {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: #b0b0b0;
+    }
+
+    .hero-tagline {
+      font-size: 1.3rem;
+      margin-top: 1.8rem;
+      color: #e6e6e6;
+      font-weight: 300;
+      text-shadow: 0 0 5px #00f0ff;
+    }
+
+    /* ===== GLASS CARD STYLE ===== */
+    .glass-card {
+      background: rgba(20, 20, 28, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 40px;
+      padding: 2.5rem;
+      box-shadow: 0 25px 40px -15px black, 0 0 0 1px rgba(0,240,255,0.1) inset;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    }
+
+    .glass-card:hover {
+      border-color: #00f0ff;
+      box-shadow: 0 30px 50px -20px black, 0 0 25px rgba(0,240,255,0.3);
+    }
+
+    .tilt-card {
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* ===== ABOUT SECTION ===== */
+    .about-text {
+      font-size: 1.3rem;
+      line-height: 1.7;
+      color: #ddd;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .about-highlight {
+      color: #d4af37;
+      font-weight: 500;
+    }
+
+    /* ===== EDUCATION ===== */
+    .edu-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .edu-degree {
+      font-size: 2rem;
+      font-weight: 450;
+      color: #d4af37;
+    }
+
+    .edu-institution {
+      font-size: 1.3rem;
+      margin: 0.5rem 0 1rem;
+      color: #00f0ff;
+    }
+
+    .edu-detail {
+      display: flex;
+      gap: 2.5rem;
+      color: #b0b0b0;
+      font-size: 1.2rem;
+      border-top: 1px dashed #2a2a35;
+      padding-top: 1.2rem;
+      margin-top: 1.2rem;
+    }
+
+    /* ===== SKILLS ===== */
+    .skills-container {
+      max-width: 800px;
+      margin: 2rem auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .skill-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .skill-name {
+      min-width: 200px;
+      font-size: 1.2rem;
+      color: #e6e6e6;
+    }
+
+    .skill-bar-bg {
+      flex: 1;
+      height: 8px;
+      background: #1e1e28;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 5px #00f0ff33;
+    }
+
+    .skill-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #d4af37, #00f0ff, #8a2be2);
+      border-radius: 20px;
+      box-shadow: 0 0 15px #00f0ff;
+      transition: width 1.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    /* ===== PROJECT CARDS ===== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .project-card {
+      background: rgba(20, 20, 28, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 30px;
+      padding: 2rem 1.8rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .project-card:hover {
+      border-color: #8a2be2;
+      box-shadow: 0 0 30px rgba(138, 43, 226, 0.4), 0 0 0 1px #00f0ff inset;
+    }
+
+    .project-title {
+      font-size: 1.8rem;
+      font-weight: 450;
+      margin-bottom: 1rem;
+      color: #d4af37;
+    }
+
+    /* ===== ACHIEVEMENTS ===== */
+    .achievements-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.5rem;
+      justify-content: center;
+    }
+
+    .achievement-item {
+      background: rgba(20, 20, 28, 0.4);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 140, 0, 0.3);
+      border-radius: 100px;
+      padding: 1rem 2.5rem;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 0 15px #ff8c00;
+      color: #ffd966;
+    }
+
+    .achievement-item span {
+      font-size: 2rem;
+      filter: drop-shadow(0 0 10px orange);
+    }
+
+    /* ===== CONTACT ===== */
+    .contact-card {
+      background: rgba(20, 20, 28, 0.4);
+      backdrop-filter: blur(12px);
+      border: 1px solid #d4af37;
+      border-radius: 60px;
+      padding: 2.8rem 2rem;
+      max-width: 700px;
+      margin: 2rem auto;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+    }
+
+    .contact-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1.3rem;
+      background: #14141c;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      border: 1px solid #00f0ff;
+      margin: 0.5rem;
+    }
+
+    /* ===== PROFESSIONAL CHATBOT (TYSON AI) ===== */
+    .tyson-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .tyson-button {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #14141c;
+      border: 2px solid #00f0ff;
+      box-shadow: 0 0 30px #00f0ff, 0 0 10px #8a2be2 inset;
+      cursor: pointer;
+      animation: breatheGlow 2s infinite alternate ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00f0ff;
+      font-size: 2rem;
+      transition: 0.2s;
+    }
+
+    @keyframes breatheGlow {
+      0% { box-shadow: 0 0 20px #00f0ff, 0 0 30px #8a2be2; border-color: #00f0ff; }
+      100% { box-shadow: 0 0 40px #00f0ff, 0 0 70px #8a2be2; border-color: #d4af37; }
+    }
+
+    .tyson-popup {
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid #00f0ff;
+      border-radius: 30px;
+      width: 340px;
+      margin-bottom: 1rem;
+      padding: 1.2rem;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 0 60px #00f0ff66;
+      transform: translateY(20px);
+      transition: opacity 0.3s, transform 0.3s;
+      color: #f0f0f0;
+    }
+
+    .tyson-popup.show {
+      display: flex;
+      animation: slideUp 0.3s forwards;
+    }
+
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .assistant-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #d4af37;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .assistant-header span {
+      font-size: 1.8rem;
+      filter: drop-shadow(0 0 8px #00f0ff);
+    }
+    .assistant-header .name {
+      color: #d4af37;
+      font-size: 1.2rem;
+    }
+
+    .chat-messages {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 20px;
+      padding: 0.8rem;
+      height: 160px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      border: 1px solid #8a2be2;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .message {
+      padding: 6px 12px;
+      border-radius: 18px;
+      max-width: 85%;
+      word-break: break-word;
+    }
+    .user-message {
+      background: #1e2a3a;
+      align-self: flex-end;
+      border: 1px solid #00f0ff;
+    }
+    .bot-message {
+      background: #2a1e3a;
+      align-self: flex-start;
+      border: 1px solid #d4af37;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input-area input {
+      flex: 1;
+      background: #0a0a0f;
+      border: 1px solid #8a2be2;
+      border-radius: 40px;
+      padding: 0.7rem 1rem;
+      color: white;
+    }
+    .chat-input-area button {
+      background: #00f0ff;
+      border: none;
+      border-radius: 40px;
+      padding: 0 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .chat-input-area button:hover {
+      background: #d4af37;
+      box-shadow: 0 0 20px #d4af37;
+    }
+    .close-chat {
+      background: transparent;
+      border: 1px solid #d4af37;
+      color: #d4af37;
+      border-radius: 40px;
+      padding: 0.4rem;
+      margin-top: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 700px) {
+      .hero h1 { font-size: 3rem; }
+      h2 { font-size: 2rem; }
+      .navbar { padding: 0.5rem 1rem; }
+      .nav-links { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <div class="main-wrapper">
+
+    <!-- STICKY NAVBAR (now with About) -->
+    <nav class="navbar">
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#achievements">Achievements</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section id="home" class="hero section-container">
+      <div class="hero-glow-sphere"></div>
+      <h1>Ranjanesh A</h1>
+      <div class="title">VLSI Design Enthusiast | Embedded Systems Engineer</div>
+      <div class="location">📍 Namakkal, Tamil Nadu</div>
+      <div class="hero-tagline">Engineering Intelligence at the Nano-Scale.</div>
+    </section>
+
+    <!-- NEW ABOUT SECTION (professional) -->
+    <section id="about" class="section-container">
+      <h2>About Me</h2>
+      <div class="glass-card tilt-card about-text">
+        <p>I'm <span class="about-highlight">Ranjanesh A</span>, a third-year Electronics and Communication Engineering student at Government College of Engineering, Salem. My passion lies in <span class="about-highlight">VLSI design</span> and <span class="about-highlight">embedded systems</span> — crafting efficient, low-level hardware-software solutions.</p>
+        <p style="margin-top: 1.5rem;">I thrive on transforming complex problems into clean digital architectures. Whether it's optimizing fan control systems or building accident alert modules, I aim for precision and innovation. Beyond academics, I'm a state-level boxing medalist, which instilled discipline and a competitive edge.</p>
+        <p style="margin-top: 1.5rem;">I'm actively seeking opportunities to contribute to cutting-edge semiconductor and firmware projects.</p>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section id="education" class="section-container">
+      <h2>Education</h2>
+      <div class="edu-container glass-card tilt-card" id="edu-card">
+        <div class="edu-degree">B.E. Electronics and Communication Engineering</div>
+        <div class="edu-institution">Government College of Engineering, Salem</div>
+        <div class="edu-detail"><span>2023 – 2027</span><span>CGPA: 7.69</span></div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section-container">
+      <h2>Skills</h2>
+      <div class="skills-container">
+        <div class="skill-item"><span class="skill-name">VLSI Design</span><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="92"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Digital Electronics</span><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="88"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Embedded Systems</span><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="85"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Microprocessors & µC</span><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="83"></div></div></div>
+        <div class="skill-item"><span class="skill-name">C</span><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="80"></div></div></div>
+        <div class="skill-item"><span class="skill-name">C++</span><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="75"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Python</span><div class="skill-bar-bg"><div class="skill-bar-fill" data-width="78"></div></div></div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section-container">
+      <h2>Projects</h2>
+      <div class="projects-grid">
+        <div class="project-card tilt-card"><div class="project-title">Fan Control System</div><div>Automated environmental-based fan speed optimization system.</div></div>
+        <div class="project-card tilt-card"><div class="project-title">Water Leakage Detection</div><div>Sensor-based early warning infrastructure monitoring system.</div></div>
+        <div class="project-card tilt-card"><div class="project-title">Accident Monitoring System</div><div>Embedded accident detection and emergency alert communication.</div></div>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section id="achievements" class="section-container">
+      <h2>Achievements</h2>
+      <div class="achievements-list">
+        <div class="achievement-item"><span>🥊</span> State Level Medalist</div>
+        <div class="achievement-item"><span>🥊</span> District Level Medalist</div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section-container">
+      <h2>Contact</h2>
+      <div class="contact-card">
+        <div class="contact-item"><span>📧</span> kunnamaliranjit@gmail.com</div>
+        <div class="contact-item"><span>📍</span> Namakkal, Tamil Nadu</div>
+      </div>
+    </section>
+  </div> <!-- main-wrapper -->
+
+  <!-- PROFESSIONAL CHATBOT - TYSON AI (clear, functional) -->
+  <div class="tyson-container">
+    <div class="tyson-popup" id="tysonPopup">
+      <div class="assistant-header">
+        <span>⚡</span>
+        <span class="name">Tyson AI — Portfolio Assistant</span>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="message bot-message">Hello! I'm Tyson. Ask me about Ranjanesh's skills, projects, or achievements.</div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="tysonInput" placeholder="e.g., Tell me about VLSI projects" value="Fan control project?">
+        <button id="tysonSend">Send</button>
+      </div>
+      <button class="close-chat" onclick="document.getElementById('tysonPopup').classList.remove('show')">close</button>
+    </div>
+    <div class="tyson-button" id="tysonToggle" onclick="document.getElementById('tysonPopup').classList.toggle('show')">⚡</div>
+  </div>
+
+  <script>
+    (function() {
+      // ===== PARTICLE NET =====
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+      const particleCount = 80;
+
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+          particles.push({
+            x: Math.random(),
+            y: Math.random(),
+            vx: (Math.random() - 0.5) * 0.001,
+            vy: (Math.random() - 0.5) * 0.001,
+          });
+        }
+      }
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+
+      function drawParticles() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 0.5;
+        ctx.shadowColor = '#8a2be2';
+        ctx.shadowBlur = 8;
+
+        for (let p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = 1;
+          if (p.x > 1) p.x = 0;
+          if (p.y < 0) p.y = 1;
+          if (p.y > 1) p.y = 0;
+        }
+
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i+1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 0.12) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x * width, particles[i].y * height);
+              ctx.lineTo(particles[j].x * width, particles[j].y * height);
+              ctx.strokeStyle = `rgba(0, 240, 255, ${0.3 - dist*2})`;
+              ctx.stroke();
+            }
+          }
+        }
+
+        for (let p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.x * width, p.y * height, 2, 0, 2*Math.PI);
+          ctx.fillStyle = '#d4af37';
+          ctx.shadowBlur = 12;
+          ctx.fill();
+        }
+        requestAnimationFrame(drawParticles);
+      }
+
+      window.addEventListener('resize', () => { resizeCanvas(); });
+      resizeCanvas();
+      initParticles();
+      drawParticles();
+
+      // ===== SCROLL REVEAL =====
+      const sections = document.querySelectorAll('.section-container');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            if (entry.target.id === 'skills') {
+              document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+                const w = bar.getAttribute('data-width') || '80';
+                bar.style.width = w + '%';
+              });
+            }
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+      sections.forEach(s => observer.observe(s));
+      document.getElementById('home').classList.add('revealed');
+
+      // ===== 3D TILT EFFECT =====
+      const tiltCards = document.querySelectorAll('.tilt-card');
+      tiltCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotX = (y - centerY) / 15;
+          const rotY = (centerX - x) / 15;
+          card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) scale(1)';
+        });
+      });
+
+      // ===== PROFESSIONAL CHATBOT LOGIC =====
+      const chatMessages = document.getElementById('chatMessages');
+      const tysonInput = document.getElementById('tysonInput');
+      const tysonSend = document.getElementById('tysonSend');
+
+      function addMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+        msgDiv.textContent = text;
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function getBotResponse(userText) {
+        const lower = userText.toLowerCase();
+        if (lower.includes('fan') || lower.includes('control')) {
+          return "The Fan Control System uses temperature/humidity sensors to automatically adjust fan speed, reducing power consumption.";
+        } else if (lower.includes('water') || lower.includes('leak')) {
+          return "Water Leakage Detection employs moisture sensors and alerts via GSM, ideal for smart infrastructure.";
+        } else if (lower.includes('accident') || lower.includes('monitor')) {
+          return "Accident Monitoring System detects vehicle crashes and sends location via GPS to emergency contacts.";
+        } else if (lower.includes('vlsi') || lower.includes('skill')) {
+          return "Ranjanesh has strong VLSI design skills (92%), with experience in digital design and simulation tools.";
+        } else if (lower.includes('achievement') || lower.includes('boxing')) {
+          return "He is a State and District level boxing medalist – bringing discipline and focus to engineering.";
+        } else {
+          return "I can tell you about projects, skills, or achievements. What would you like to know?";
+        }
+      }
+
+      tysonSend.addEventListener('click', () => {
+        const question = tysonInput.value.trim();
+        if (question === '') return;
+        addMessage(question, 'user');
+        tysonInput.value = '';
+        setTimeout(() => {
+          const answer = getBotResponse(question);
+          addMessage(answer, 'bot');
+        }, 400);
+      });
+
+      tysonInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') tysonSend.click();
+      });
+
+      // initial greeting
+    })();
+  </script>
+</body>
+</html>
